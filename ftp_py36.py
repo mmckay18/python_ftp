@@ -8,9 +8,7 @@ def grabFile(file):
     filename = file
     print(filename)
     localfile = open(filename, 'wb')
-    #print(localfile.write)
-    ftp.retrbinary('RETR ' + filename, localfile.write, 217252800)
-    #print(ftp.retrbinary('RETR ' + filename, localfile.write, 1024))
+    ftp.retrbinary('RETR ' + filename, localfile.write, 1024)
     localfile.close()
 
 
@@ -68,23 +66,28 @@ if __name__ == '__main__':
     args = parse_args()
 
     os.chdir(args.path)  # cd into working directory
-    ftp = FTP(args.host)
     # ftp = FTP('archive.stsci.edu')
-    ftp.login(user=args.username, passwd=args.password)
     # ftp.login(user='anonymous', passwd='mckaymyles18@gmail.com')
-
     # ftp.cwd('/stage/anonymous/anonymous12084')
-    ftp.cwd(args.data_dir)
-    ftp.retrlines('LIST')
-    list_of_files = ftp.nlst()
-    #print(list_of_files)
-    for file in list_of_files:
-        print('Copying {} to {}'.format(file, args.path))
-        grabFile(file)
+    ftp = FTP(args.host) # connect to host
+    ftp.login(user=args.username, passwd=args.password) #Login username and password
+    ftp.cwd(args.data_dir) # cd into data directory on the host server
+    ftp.retrlines('LIST')# list all files in host server directory
+    list_of_files = ftp.nlst() #makes a list of all the files in server directory
 
-    ftp.quit()
+    for file in list_of_files: #iterates through file list
+        print('Copying {} to {}'.format(file, args.path)) # print statement
+        grabFile(file)# download file from server
+
+    ftp.quit() # quit out of ftp
     # placeFile()
 
+    # ====================================================
+    
+    #Example command line run
+    #staged hst data from MAST
+    #run ftp_py36.py --path='/Users/mmckay/Desktop/' --host='archive.stsci.edu' --username='anonymous' --userpw='mckaymyles18@gmail.com' --data_dir='/stage/anonymous/anonymous12084'
+
+    # ====================================================
 
 
-#run ftp_py36.py --path='/Users/mmckay/Desktop/' --host='archive.stsci.edu' --username='anonymous' --userpw='mckaymyles18@gmail.com' --data_dir='/stage/anonymous/anonymous12084'
